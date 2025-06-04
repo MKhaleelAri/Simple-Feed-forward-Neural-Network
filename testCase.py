@@ -1,7 +1,7 @@
 import FFNN
 import numpy as np
 
-data1 = np.array([
+data = np.array([
     [175, 70, 80, 10, 0],
     [180, 68, 75, 9.8, 0],
     [170, 60, 55, 11.5, 1],
@@ -110,78 +110,42 @@ data1 = np.array([
     [178, 70, 84, 10.2, 0],
     [163, 56, 53, 12.3, 1],
     [188, 105, 154, 15.1, 2],
-    [176, 68, 80, 10.4, 0],
+
+])
+
+data_predictions = np.array([
     [165, 58, 55, 11.9, 1],
+    [161, 54, 50, 12.8, 1],
+    [189, 108, 165, 15.4, 2],
+    [175, 68, 80, 10.1, 0],
+    [186, 104, 150, 14.7, 2],
+    [178, 72, 85, 10.5, 0],
+    [164, 58, 52, 11.6, 1],
+    [176, 68, 80, 10.4, 0],
     [190, 108, 166, 15.5, 2],
+    [167, 61, 63, 12.3, 1],
+    [193, 112, 174, 15.8, 2],
+    [179, 73, 89, 10.0, 0],
+    [192, 110, 168, 15.9, 2],
+    [180, 75, 93, 10.2, 0],
+    [162, 55, 48, 12.6, 1],
 ])
 
+def testData(dat):
+    for data in dat:
+        input_features = data[:-1]  # Exclude the last element (actual class)
+        actual_class = int(data[-1])    # The last element is the actual class
+        predicted_class = nn.predict(input_features)
+        print("Predicted Class:", predicted_class, "Actual Class:", actual_class)
 
-"""
-Dataset Explanation:
-
-This variable `data` is a list of records where each record represents a patient's medical and demographic information along with their prescribed drug category.
-
-Each record is a list with the following attributes in order:
-
-1. Age (integer) - Patient's age in years.
-2. Sex (integer) - Patient's sex, encoded as 0 for female and 1 for male.
-3. BP (Blood Pressure) (integer) - Encoded blood pressure level:
-    0 = low
-    1 = normal
-    2 = high
-4. Cholesterol (integer) - Encoded cholesterol level:
-    0 = normal
-    1 = high
-5. Na_to_K (float) - The sodium to potassium ratio in the patient's blood.
-6. Drug (integer) - The drug category prescribed to the patient, encoded as integers (e.g., 0 = Drug X, 1 = Drug Y, 2 = Drug Z).
-
-This dataset can be used to train or test a classification algorithm to predict the drug category based on patient features.
-"""
-
-data = np.array([
-    [23, 1, 2, 1, 25.355, 1],
-    [47, 0, 0, 1, 13.093, 2],
-    [47, 0, 0, 1, 10.114, 2],
-    [28, 1, 1, 1, 7.798, 0],
-    [61, 1, 0, 1, 18.043, 1],
-    [22, 1, 0, 0, 8.607, 0],
-    [49, 1, 1, 0, 16.275, 1],
-    [41, 0, 0, 0, 11.037, 0],
-    [60, 0, 1, 1, 15.171, 1],
-    [43, 1, 0, 0, 19.368, 1],
-    [47, 0, 0, 1, 11.767, 2],
-    [34, 1, 2, 0, 19.199, 1],
-    [43, 0, 1, 0, 15.376, 1],
-    [74, 1, 2, 0, 20.942, 1],
-    [50, 1, 1, 0, 12.703, 0],
-    [16, 1, 2, 1, 22.818, 1],
-    [69, 0, 1, 1, 15.516, 1],
-    [43, 0, 0, 0, 9.171, 2],
-    [23, 0, 0, 1, 13.769, 2],
-    [32, 1, 2, 0, 19.199, 1],
-    [57, 0, 0, 1, 9.514, 2],
-    [63, 0, 1, 0, 10.672, 2],
-    [47, 0, 0, 1, 6.683, 0],
-    [48, 1, 0, 1, 10.342, 2],
-    [33, 1, 0, 0, 18.924, 1],
-    [28, 1, 2, 0, 19.199, 1],
-    [52, 0, 1, 1, 32.922, 1],
-    [25, 1, 2, 0, 10.391, 1],
-    [49, 0, 0, 0, 13.092, 2],
-    [41, 0, 0, 1, 18.703, 1],
-    [60, 0, 2, 0, 24.276, 1],
-    [43, 1, 1, 0, 25.467, 1],
-    [34, 1, 2, 1, 20.909, 1]
-])
-
-hd1 = 8
+hd1 = 4
 hd2 = 6
-lr = 0.01
+hd3 = 4
+lr = 0.0225
 bs = 2
-e = 100
+e = 50
 
-nn = FFNN.Machine(data, hd1, hd2, lr, bs, e)
+nn = FFNN.Machine(data, hd1, hd2, hd3, lr, bs, e)
 
-print("Predicted Class for Drug X Sample:", nn.predict(np.array([20, 0, 2, 1, 7.298])))
-print("Predicted Class for Drug Y Sample:", nn.predict(np.array([50, 0, 1, 0, 25.974])))
-print("Predicted Class for Drug Z Sample:", nn.predict(np.array([47, 1, 0, 0, 10.073])))
+testData(data_predictions)
+
