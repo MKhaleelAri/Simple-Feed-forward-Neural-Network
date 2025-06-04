@@ -7,11 +7,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 class Machine:
-    def __init__(self, data, hd1, hd2, lr, bs, e):
+    def __init__(self, data, hd1, hd2, hd3, lr, bs, e):
         #Setting Fields
         self.data = data
         self.hiddenDim1 = hd1
         self.hiddenDim2 = hd2
+        self.hiddenDim3 = hd3
         self.learningRate = lr
         self.batchSize = bs
         self.epochs = e
@@ -27,7 +28,7 @@ class Machine:
         self.xTrain, self.xTest, self.yTrain, self.yTest = train_test_split(
             self.input,
             self.output,
-            test_size=0.15,
+            test_size=0.25,
             random_state=42
         )
         self.scaler = StandardScaler()
@@ -36,12 +37,12 @@ class Machine:
 
         #randomKey = jax.random.key(int(time.time())) #different key based on time
         randomKey = jax.random.PRNGKey(int(time.time())) #alternative method
-        self.params = self.init_params(self.inputDim, self.hiddenDim1, self.hiddenDim2, self.outputDim, randomKey)
+        self.params = self.init_params(self.inputDim, self.hiddenDim1, self.hiddenDim2, self.hiddenDim3, self.outputDim, randomKey)
 
         self.run()
 
-    def init_params(self, inputDim, hiddenDim1, hiddenDim2, outputDim, randomKey):
-        randomKey = jax.random.split(randomKey, 3) #spliting into three keys
+    def init_params(self, inputDim, hiddenDim1, hiddenDim2, hiddenDim3, outputDim, randomKey):
+        randomKey = jax.random.split(randomKey, 4) #spliting into three keys
 
         #first weight matrix
         W1 = jax.random.normal(randomKey[0], (inputDim, hiddenDim1))
@@ -50,16 +51,20 @@ class Machine:
         W2 = jax.random.normal(randomKey[1], (hiddenDim1, hiddenDim2))
         B2 = jnp.zeros((hiddenDim2, ))
 
-        W3 = jax.random.normal(randomKey[2], (hiddenDim2, outputDim))
-        B3 = jnp.zeros((outputDim, ))
+        W3 = jax.random.normal(randomKey[2], (hiddenDim2, hiddenDim3))
+        B3 = jnp.zeros((hiddenDim3, ))
 
-        return W1, B1, W2, B2, W3, B3
+        W4 = jax.random.normal(randomKey[3], (hiddenDim3, outputDim))
+        B4 = jnp.zeros((outputDim, ))
+
+        return W1, B1, W2, B2, W3, B3, W4, B4
         
     def forward(self, params, X):
-        W1, B1, W2, B2, W3, B3 = params
+        W1, B1, W2, B2, W3, B3, W4, B4 = params
         h1 = jax.nn.relu(jnp.dot(X, W1) + B1)
         h2 = jax.nn.relu(jnp.dot(h1, W2) + B2)
-        logits = jnp.dot(h2, W3) + B3
+        h3 = jax.nn.relu(jnp.dot(h2, W3) + B3)
+        logits = jnp.dot(h3, W4) + B4
         return logits
     
     def lossFN(self, params, x, y, l2_reg=0.0001):
@@ -109,5 +114,9 @@ class Machine:
                 train_acc = self.accuracy(self.params, self.xTrain, self.yTrain)
                 test_acc = self.accuracy(self.params, self.xTest, self.yTest)
                 print(f"Epoch {epoch}: Train Acc ({train_acc:.4f}), Test Acc ({test_acc:.4f})")
+
+                if(train_acc == 1.0 and test_acc == 1.0):
+                    print("Training and Test accuracy have both reached 100, moving on to predictions")
+                    break
 
         print(f"Final Test Accuracy: {self.accuracy(self.params, self.xTest, self.yTest):.4f}")
